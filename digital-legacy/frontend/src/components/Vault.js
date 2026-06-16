@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { 
   Archive, Plus, Trash2, Eye, EyeOff, Lock,
-  ChevronDown, Search, X, Save
+  ChevronDown, Search, X, Save, Upload, FileUp, FileText, FileDown, Hash, Key
 } from 'lucide-react';
 import axios from 'axios';
 import { 
