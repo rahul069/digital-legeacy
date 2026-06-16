@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Users, Plus, Trash2, User, Mail, Phone, MapPin, Heart, Star, X, Save, Crown, Shield } from 'lucide-react';
+import { Users, Plus, Trash2, User, Mail, Phone, MapPin, Heart, Star, X, Save, Crown, Shield, Camera, Upload } from 'lucide-react';
 import axios from 'axios';
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000/api';
@@ -15,9 +15,12 @@ const Beneficiaries = () => {
     phone: '',
     relationship: '',
     address: '',
+    photo: null,
     is_primary: false,
     can_access_before_death: false
   });
+  const [photoPreview, setPhotoPreview] = useState(null);
+  const [editingId, setEditingId] = useState(null);
 
   useEffect(() => {
     fetchBeneficiaries();
@@ -34,19 +37,68 @@ const Beneficiaries = () => {
     }
   };
 
+  const handlePhotoChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setFormData({ ...formData, photo: file });
+      const reader = new FileReader();
+      reader.onloadend = () => setPhotoPreview(reader.result);
+      reader.readAsDataURL(file);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post(`${API_URL}/beneficiaries/`, formData);
+      const data = new FormData();
+      data.append('name', formData.name);
+      data.append('email', formData.email);
+      data.append('phone', formData.phone);
+      data.append('relationship', formData.relationship);
+      data.append('address', formData.address);
+      data.append('is_primary', formData.is_primary);
+      data.append('can_access_before_death', formData.can_access_before_death);
+      if (formData.photo) {
+        data.append('photo', formData.photo);
+      }
+
+      if (editingId) {
+        await axios.patch(`${API_URL}/beneficiaries/${editingId}/`, data, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        });
+      } else {
+        await axios.post(`${API_URL}/beneficiaries/`, data, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        });
+      }
+
       setFormData({
         name: '', email: '', phone: '', relationship: '',
-        address: '', is_primary: false, can_access_before_death: false
+        address: '', photo: null, is_primary: false, can_access_before_death: false
       });
+      setPhotoPreview(null);
+      setEditingId(null);
       setShowForm(false);
       fetchBeneficiaries();
     } catch (err) {
-      alert('Failed to add beneficiary');
+      alert('Failed to save beneficiary');
     }
+  };
+
+  const handleEdit = (b) => {
+    setFormData({
+      name: b.name,
+      email: b.email,
+      phone: b.phone || '',
+      relationship: b.relationship || '',
+      address: b.address || '',
+      photo: null,
+      is_primary: b.is_primary,
+      can_access_before_death: b.can_access_before_death
+    });
+    setPhotoPreview(b.photo_url || null);
+    setEditingId(b.id);
+    setShowForm(true);
   };
 
   const handleDelete = async (id) => {
@@ -75,20 +127,47 @@ const Beneficiaries = () => {
         </button>
       </div>
 
-      {/* Add Form */}
+      {/* Add/Edit Form */}
       {showForm && (
         <div className="card gradient-border animate-slide-in">
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-lg font-bold text-white flex items-center gap-2">
               <Users className="w-5 h-5 text-blue-400" />
-              New Beneficiary
+              {editingId ? 'Edit Beneficiary' : 'New Beneficiary'}
             </h3>
-            <button onClick={() => setShowForm(false)} className="p-2 text-gray-500 hover:text-white hover:bg-gray-800 rounded-lg transition-all">
+            <button onClick={() => { setShowForm(false); setEditingId(null); setPhotoPreview(null); }} className="p-2 text-gray-500 hover:text-white hover:bg-gray-800 rounded-lg transition-all">
               <X className="w-5 h-5" />
             </button>
           </div>
           
           <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Photo Upload */}
+            <div className="md:col-span-2">
+              <label className="block text-sm font-medium text-gray-400 mb-2">Photo</label>
+              <div className="flex items-center gap-4">
+                <div className="w-20 h-20 rounded-xl bg-gray-800 border border-gray-700 flex items-center justify-center overflow-hidden">
+                  {photoPreview ? (
+                    <img src={photoPreview} alt="Preview" className="w-full h-full object-cover" />
+                  ) : (
+                    <Camera className="w-8 h-8 text-gray-500" />
+                  )}
+                </div>
+                <div className="flex-1">
+                  <label className="flex items-center gap-2 px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-xl cursor-pointer transition-all border border-gray-700 w-fit">
+                    <Upload className="w-4 h-4 text-gray-400" />
+                    <span className="text-sm text-gray-400">{photoPreview ? 'Change Photo' : 'Upload Photo'}</span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handlePhotoChange}
+                      className="hidden"
+                    />
+                  </label>
+                  <p className="text-xs text-gray-500 mt-1">JPG, PNG up to 5MB</p>
+                </div>
+              </div>
+            </div>
+
             <div className="md:col-span-2">
               <label className="block text-sm font-medium text-gray-400 mb-2">Full Name *</label>
               <div className="relative">
@@ -190,12 +269,12 @@ const Beneficiaries = () => {
             </div>
             
             <div className="md:col-span-2 flex justify-end gap-3">
-              <button type="button" onClick={() => setShowForm(false)} className="btn-secondary">
+              <button type="button" onClick={() => { setShowForm(false); setEditingId(null); setPhotoPreview(null); }} className="btn-secondary">
                 Cancel
               </button>
               <button type="submit" className="btn-primary flex items-center gap-2">
                 <Save className="w-5 h-5" />
-                Save Beneficiary
+                {editingId ? 'Update' : 'Save'} Beneficiary
               </button>
             </div>
           </form>
@@ -223,10 +302,14 @@ const Beneficiaries = () => {
             <div key={b.id} className="card-hover animate-slide-in">
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center">
-                    <span className="text-white font-bold text-sm">
-                      {b.name.split(' ').map(n => n[0]).join('').toUpperCase()}
-                    </span>
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center overflow-hidden">
+                    {b.photo_url ? (
+                      <img src={b.photo_url} alt={b.name} className="w-full h-full object-cover" />
+                    ) : (
+                      <span className="text-white font-bold text-sm">
+                        {b.name.split(' ').map(n => n[0]).join('').toUpperCase()}
+                      </span>
+                    )}
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
@@ -240,12 +323,20 @@ const Beneficiaries = () => {
                     <p className="text-xs text-gray-500">{b.relationship}</p>
                   </div>
                 </div>
-                <button
-                  onClick={() => handleDelete(b.id)}
-                  className="p-2 text-gray-500 hover:text-red-400 hover:bg-red-500/10 rounded-xl transition-all"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </button>
+                <div className="flex items-center gap-1">
+                  <button
+                    onClick={() => handleEdit(b)}
+                    className="p-2 text-gray-500 hover:text-blue-400 hover:bg-blue-500/10 rounded-xl transition-all"
+                  >
+                    <Save className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => handleDelete(b.id)}
+                    className="p-2 text-gray-500 hover:text-red-400 hover:bg-red-500/10 rounded-xl transition-all"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
               </div>
               
               <div className="space-y-2 text-sm">

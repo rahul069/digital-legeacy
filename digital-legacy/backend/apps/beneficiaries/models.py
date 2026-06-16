@@ -11,6 +11,7 @@ class Beneficiary(models.Model):
     relationship = models.CharField(max_length=50, blank=True)
     address = models.TextField(blank=True)
     date_of_birth = models.DateField(null=True, blank=True)
+    photo = models.ImageField(upload_to='beneficiary_photos/%Y/%m/%d/', blank=True, null=True)
     is_primary = models.BooleanField(default=False)
     can_access_before_death = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)

@@ -1,4 +1,5 @@
 from rest_framework import generics
+from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from .models import Beneficiary
 from .serializers import BeneficiarySerializer, BeneficiaryCreateSerializer
 from apps.legacy.models import AuditLog
@@ -19,10 +20,17 @@ def log_audit(request, action, entity_type, entity_id, old_value='', new_value='
 
 
 class BeneficiaryListCreateView(generics.ListCreateAPIView):
+    parser_classes = [JSONParser, MultiPartParser, FormParser]
+    
     def get_serializer_class(self):
         if self.request.method == 'POST':
             return BeneficiaryCreateSerializer
         return BeneficiarySerializer
+    
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context['request'] = self.request
+        return context
     
     def get_queryset(self):
         return Beneficiary.objects.filter(user=self.request.user)
@@ -34,6 +42,12 @@ class BeneficiaryListCreateView(generics.ListCreateAPIView):
 
 class BeneficiaryDetailView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = BeneficiarySerializer
+    parser_classes = [JSONParser, MultiPartParser, FormParser]
+    
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context['request'] = self.request
+        return context
     
     def get_queryset(self):
         return Beneficiary.objects.filter(user=self.request.user)
