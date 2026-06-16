@@ -5,19 +5,23 @@ import {
   Search, X, Save, Key, Hash, Upload, FileUp, FileDown, FileText2
 } from 'lucide-react';
 import axios from 'axios';
+import { 
+  AccountIcon, CryptoIcon, DocumentIcon, SubscriptionIcon, 
+  InsuranceIcon, FinancialIcon, DeviceIcon, SocialIcon, OtherIcon 
+} from './AssetIcons';
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000/api';
 
 const assetTypes = [
-  { value: 'account', label: 'Account', icon: Lock, color: 'text-blue-400', bg: 'bg-blue-500/10', border: 'border-blue-500/20' },
-  { value: 'crypto', label: 'Crypto', icon: Database, color: 'text-orange-400', bg: 'bg-orange-500/10', border: 'border-orange-500/20' },
-  { value: 'document', label: 'Document', icon: FileText, color: 'text-yellow-400', bg: 'bg-yellow-500/10', border: 'border-yellow-500/20' },
-  { value: 'subscription', label: 'Subscription', icon: CreditCard, color: 'text-purple-400', bg: 'bg-purple-500/10', border: 'border-purple-500/20' },
-  { value: 'insurance', label: 'Insurance', icon: Shield, color: 'text-emerald-400', bg: 'bg-emerald-500/10', border: 'border-emerald-500/20' },
-  { value: 'financial', label: 'Financial', icon: CreditCard, color: 'text-cyan-400', bg: 'bg-cyan-500/10', border: 'border-cyan-500/20' },
-  { value: 'device', label: 'Device', icon: Smartphone, color: 'text-pink-400', bg: 'bg-pink-500/10', border: 'border-pink-500/20' },
-  { value: 'social', label: 'Social', icon: Globe, color: 'text-indigo-400', bg: 'bg-indigo-500/10', border: 'border-indigo-500/20' },
-  { value: 'other', label: 'Other', icon: Archive, color: 'text-gray-400', bg: 'bg-gray-500/10', border: 'border-gray-500/20' },
+  { value: 'account', label: 'Account', icon: AccountIcon, color: 'text-blue-400', bg: 'bg-blue-500/10', border: 'border-blue-500/20' },
+  { value: 'crypto', label: 'Crypto', icon: CryptoIcon, color: 'text-orange-400', bg: 'bg-orange-500/10', border: 'border-orange-500/20' },
+  { value: 'document', label: 'Document', icon: DocumentIcon, color: 'text-yellow-400', bg: 'bg-yellow-500/10', border: 'border-yellow-500/20' },
+  { value: 'subscription', label: 'Subscription', icon: SubscriptionIcon, color: 'text-purple-400', bg: 'bg-purple-500/10', border: 'border-purple-500/20' },
+  { value: 'insurance', label: 'Insurance', icon: InsuranceIcon, color: 'text-emerald-400', bg: 'bg-emerald-500/10', border: 'border-emerald-500/20' },
+  { value: 'financial', label: 'Financial', icon: FinancialIcon, color: 'text-cyan-400', bg: 'bg-cyan-500/10', border: 'border-cyan-500/20' },
+  { value: 'device', label: 'Device', icon: DeviceIcon, color: 'text-pink-400', bg: 'bg-pink-500/10', border: 'border-pink-500/20' },
+  { value: 'social', label: 'Social', icon: SocialIcon, color: 'text-indigo-400', bg: 'bg-indigo-500/10', border: 'border-indigo-500/20' },
+  { value: 'other', label: 'Other', icon: OtherIcon, color: 'text-gray-400', bg: 'bg-gray-500/10', border: 'border-gray-500/20' },
 ];
 
 const fieldConfig = {
