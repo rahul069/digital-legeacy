@@ -290,7 +290,7 @@ const Vault = () => {
             type="file"
             multiple
             onChange={handleFileChange}
-            className="hidden"
+            style={{ display: 'none' }}
             id="file-upload"
             accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.txt,.zip"
           />
