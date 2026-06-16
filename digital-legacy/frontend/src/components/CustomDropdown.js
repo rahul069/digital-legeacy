@@ -76,11 +76,7 @@ const CustomDropdown = ({ options, value, onChange, placeholder = 'Select...', c
         <div className="flex items-center gap-3">
           {selectedOption?.icon && (
             <div className="flex items-center justify-center">
-              {typeof selectedOption.icon === 'function' ? (
-                <selectedOption.icon className={`w-5 h-5 ${selectedOption.color || (isLight ? 'text-gray-500' : 'text-gray-400')}`} />
-              ) : (
-                <span className="text-lg">{selectedOption.icon}</span>
-              )}
+              <selectedOption.icon className={`w-5 h-5 ${selectedOption.color || (isLight ? 'text-gray-500' : 'text-gray-400')}`} />
             </div>
           )}
           <span className={`font-medium text-sm ${selectedOption ? selectedText : placeholderText}`}>
@@ -128,11 +124,7 @@ const CustomDropdown = ({ options, value, onChange, placeholder = 'Select...', c
               >
                 {option.icon && (
                   <div className="flex items-center justify-center w-6 h-6">
-                    {typeof option.icon === 'function' ? (
-                      <option.icon className={`w-4 h-4 ${option.color || (isLight ? 'text-gray-500' : 'text-gray-400')}`} />
-                    ) : (
-                      <span className="text-base">{option.icon}</span>
-                    )}
+                    <option.icon className={`w-4 h-4 ${option.color || (isLight ? 'text-gray-500' : 'text-gray-400')}`} />
                   </div>
                 )}
                 <span className="flex-1 text-left font-medium">{option.label}</span>
