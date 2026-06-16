@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { 
   Archive, Plus, Trash2, Eye, EyeOff, Lock,
-  ChevronDown, Search, X, Save, Upload, FileUp, FileText, FileDown, Hash, Key
+  ChevronDown, Search, X, Save, Upload, FileUp, FileText, FileDown, Hash, Key,
+  LayoutGrid
 } from 'lucide-react';
 import axios from 'axios';
 import { 
   AccountIcon, CryptoIcon, DocumentIcon, SubscriptionIcon, 
   InsuranceIcon, FinancialIcon, DeviceIcon, SocialIcon, OtherIcon 
 } from './AssetIcons';
+import CustomDropdown from './CustomDropdown';
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000/api';
 
@@ -372,18 +374,21 @@ const Vault = () => {
               className="input-field pl-12 w-72"
             />
           </div>
-          <div className="relative">
-            <select
+          <div className="relative w-48">
+            <CustomDropdown
               value={selectedType}
-              onChange={(e) => setSelectedType(e.target.value)}
-              className="input-field w-44 appearance-none pr-10"
-            >
-              <option value="all">All Types</option>
-              {assetTypes.map(t => (
-                <option key={t.value} value={t.value}>{t.label}</option>
-              ))}
-            </select>
-            <ChevronDown className="absolute right-3.5 top-3.5 w-5 h-5 text-gray-500 pointer-events-none" />
+              onChange={setSelectedType}
+              placeholder="Filter by type..."
+              options={[
+                { value: 'all', label: 'All Types', icon: LayoutGrid, color: 'text-gray-400' },
+                ...assetTypes.map(t => ({ 
+                  value: t.value, 
+                  label: t.label, 
+                  icon: t.icon, 
+                  color: t.color 
+                }))
+              ]}
+            />
           </div>
         </div>
         <button
