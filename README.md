@@ -157,25 +157,26 @@ digital-legeacy/
 │   │   ├── legacy/              # Legacy plans & audit logs
 │   │   └── core/                # Services (PDF, AI, notifications)
 │   ├── templates/               # PDF generation templates
-│   └── requirements.txt          # Python dependencies
+│   └── requirements.txt         # Python dependencies
 ├── frontend/
 │   ├── src/
 │   │   ├── components/          # React components
-│   │   │   ├── AssetIcons.js   # 3D realistic SVG icons
+│   │   │   ├── AssetIcons.js    # 3D realistic SVG icons
 │   │   │   ├── CustomDropdown.js # Beautiful dropdown component
-│   │   │   ├── AIAssistant.js  # AI dashboard
-│   │   │   ├── Vault.js        # Digital vault
-│   │   │   ├── Dashboard.js    # Dashboard
-│   │   │   ├── Layout.js       # App layout with theme toggle
+│   │   │   ├── AIAssistant.js   # AI dashboard
+│   │   │   ├── Vault.js         # Digital vault
+│   │   │   ├── Dashboard.js     # Dashboard
+│   │   │   ├── Layout.js        # App layout with theme toggle
 │   │   │   └── ...
 │   │   ├── context/
 │   │   │   └── ThemeContext.js  # Dark/light theme context
 │   │   ├── App.js
 │   │   └── index.css            # Global styles & light theme
 │   └── package.json
-├── docker-compose.yml          # Docker orchestration
+├── docker-compose.yml           # Docker orchestration
 ├── .env                         # Environment variables
-└── .gitignore
+├── .gitignore
+└── README.md
 ```
 
 ## Environment Variables
