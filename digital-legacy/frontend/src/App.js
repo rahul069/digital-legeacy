@@ -10,6 +10,7 @@ import LegacyPlans from './components/LegacyPlans';
 import SettingsPage from './components/Settings';
 import AuditLogPage from './components/AuditLog';
 import DeliveryTrackingPage from './components/DeliveryTracking';
+import AIAssistantPage from './components/AIAssistant';
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000/api';
 
@@ -56,6 +57,7 @@ function App() {
         <Route path="/legacy" element={<LegacyPlans />} />
         <Route path="/audit-log" element={<AuditLogPage />} />
         <Route path="/delivery-tracking" element={<DeliveryTrackingPage />} />
+        <Route path="/ai-assistant" element={<AIAssistantPage />} />
         <Route path="/settings" element={<SettingsPage />} />
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { 
   Shield, Archive, Users, FileText, Settings, LogOut, 
-  Activity, ChevronRight, Menu, X, Bell, User
+  Activity, ChevronRight, Menu, X, Bell, User, Brain
 } from 'lucide-react';
 import axios from 'axios';
 
@@ -17,6 +17,7 @@ const Layout = ({ children, user, setUser }) => {
     { path: '/vault', icon: Archive, label: 'Digital Vault' },
     { path: '/beneficiaries', icon: Users, label: 'Beneficiaries' },
     { path: '/legacy', icon: FileText, label: 'Legacy Plans' },
+    { path: '/ai-assistant', icon: Brain, label: 'AI Assistant' },
     { path: '/audit-log', icon: Shield, label: 'Audit Log' },
     { path: '/delivery-tracking', icon: Bell, label: 'Delivery' },
     { path: '/settings', icon: Settings, label: 'Settings' },

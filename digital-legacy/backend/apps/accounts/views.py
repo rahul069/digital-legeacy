@@ -331,3 +331,169 @@ class UpdateEscalationSettingsView(APIView):
         return Response({
             'escalation_schedule': user.get_escalation_schedule()
         })
+
+
+# =============================================================================
+# AI LEGACY SERVICES API ENDPOINTS
+# =============================================================================
+
+class AIAnalyzeSubscriptionsView(APIView):
+    """1. AI Subscription & Recurring Payment Discovery"""
+    def post(self, request):
+        from apps.core.services.ai_legacy_services import discover_subscriptions_from_text
+        text = request.data.get('text', '')
+        if not text:
+            return Response({'error': 'No text provided'}, status=400)
+        
+        subscriptions = discover_subscriptions_from_text(text)
+        total_monthly = sum(s.get('monthly_cost', 0) for s in subscriptions)
+        total_yearly = sum(s.get('yearly_cost', 0) for s in subscriptions)
+        
+        log_audit(request, 'ai_analysis', 'subscriptions', 0, 
+                  new_value=f'{len(subscriptions)} subscriptions found, ${total_monthly:.2f}/month')
+        
+        return Response({
+            'subscriptions': subscriptions,
+            'total_monthly': total_monthly,
+            'total_yearly': total_yearly,
+            'money_saved_estimate': total_yearly,
+            'analysis_date': str(timezone.now())
+        })
+
+
+class AIValuateEstateView(APIView):
+    """2. AI Digital Estate Valuator"""
+    def get(self, request):
+        from apps.core.services.ai_legacy_services import calculate_digital_estate_value
+        user = request.user
+        assets = user.vault_assets.all()
+        
+        valuation = calculate_digital_estate_value(user, assets)
+        
+        log_audit(request, 'ai_analysis', 'estate_valuation', 0,
+                  new_value=f"${valuation['total_estimated_value']:,.2f}")
+        
+        return Response(valuation)
+
+
+class AIAnalyzeLegacyGapsView(APIView):
+    """3. AI Smart Legacy Plan Advisor"""
+    def get(self, request):
+        from apps.core.services.ai_legacy_services import analyze_legacy_plan_gaps
+        user = request.user
+        assets = user.vault_assets.all()
+        beneficiaries = user.beneficiaries.all()
+        plans = user.legacy_plans.all()
+        
+        warnings = analyze_legacy_plan_gaps(user, assets, beneficiaries, plans)
+        
+        critical = len([w for w in warnings if w['severity'] == 'critical'])
+        high = len([w for w in warnings if w['severity'] == 'high'])
+        medium = len([w for w in warnings if w['severity'] == 'medium'])
+        
+        log_audit(request, 'ai_analysis', 'legacy_gaps', 0,
+                  new_value=f'{len(warnings)} gaps found: {critical} critical, {high} high')
+        
+        return Response({
+            'warnings': warnings,
+            'summary': {
+                'total': len(warnings),
+                'critical': critical,
+                'high': high,
+                'medium': medium,
+                'low': len(warnings) - critical - high - medium
+            },
+            'legacy_health_score': max(0, 100 - (critical * 20) - (high * 10) - (medium * 5)),
+            'analysis_date': str(timezone.now())
+        })
+
+
+class AIGenerateBeneficiaryGuideView(APIView):
+    """4. AI Beneficiary Onboarding Guide"""
+    def get(self, request):
+        from apps.core.services.ai_legacy_services import generate_beneficiary_guide
+        from apps.beneficiaries.models import Beneficiary
+        
+        beneficiary_id = request.query_params.get('beneficiary_id')
+        if not beneficiary_id:
+            return Response({'error': 'beneficiary_id required'}, status=400)
+        
+        try:
+            beneficiary = Beneficiary.objects.get(id=beneficiary_id, user=request.user)
+        except Beneficiary.DoesNotExist:
+            return Response({'error': 'Beneficiary not found'}, status=404)
+        
+        # Get assigned assets from legacy plans
+        assigned_assets = []
+        for plan in request.user.legacy_plans.filter(is_active=True):
+            for assignment in plan.assignments.filter(beneficiary=beneficiary):
+                assigned_assets.append(assignment.asset)
+        
+        guide = generate_beneficiary_guide(request.user, beneficiary, assigned_assets)
+        
+        log_audit(request, 'ai_generation', 'beneficiary_guide', beneficiary_id)
+        
+        return Response(guide)
+
+
+class AIExtractAssetsFromDocumentView(APIView):
+    """5. AI Document Understanding & Asset Extraction"""
+    def post(self, request):
+        from apps.core.services.ai_legacy_services import extract_assets_from_document
+        text = request.data.get('text', '')
+        document_type = request.data.get('document_type', 'auto')
+        
+        if not text:
+            return Response({'error': 'No text provided'}, status=400)
+        
+        result = extract_assets_from_document(text, document_type)
+        
+        log_audit(request, 'ai_extraction', 'document', 0,
+                  new_value=f"{len(result.get('extracted_assets', []))} assets extracted")
+        
+        return Response(result)
+
+
+class AIGenerateCleanupPlanView(APIView):
+    """6. AI Digital Footprint Cleanup Planner"""
+    def get(self, request):
+        from apps.core.services.ai_legacy_services import generate_cleanup_plan
+        user = request.user
+        assets = user.vault_assets.all()
+        
+        plan = generate_cleanup_plan(user, assets)
+        
+        log_audit(request, 'ai_generation', 'cleanup_plan', 0)
+        
+        return Response(plan)
+
+
+class AIAnalyzeFraudRiskView(APIView):
+    """7. AI Fraud Detection Monitor"""
+    def get(self, request):
+        from apps.core.services.ai_legacy_services import analyze_fraud_risk
+        user = request.user
+        assets = user.vault_assets.all()
+        audit_logs = AuditLog.objects.filter(user=user).order_by('-created_at')[:100]
+        
+        risk_analysis = analyze_fraud_risk(user, assets, audit_logs)
+        
+        log_audit(request, 'ai_analysis', 'fraud_risk', 0,
+                  new_value=f"Risk score: {risk_analysis['overall_risk_score']}")
+        
+        return Response(risk_analysis)
+
+
+class AIGenerateTaxReportView(APIView):
+    """8. AI Tax & Legal Compliance"""
+    def get(self, request):
+        from apps.core.services.ai_legacy_services import generate_tax_compliance_report
+        user = request.user
+        assets = user.vault_assets.all()
+        beneficiaries = user.beneficiaries.all()
+        
+        report = generate_tax_compliance_report(user, assets, beneficiaries)
+        
+        log_audit(request, 'ai_generation', 'tax_report', 0)
+        
+        return Response(report)
