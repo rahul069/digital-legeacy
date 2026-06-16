@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { 
-  Archive, Plus, Trash2, Eye, EyeOff, Lock, Globe, Shield,
-  CreditCard, FileText, Smartphone, Database, ChevronDown, 
-  Search, X, Save, Key, Hash, Upload, FileUp, FileDown, FileText2
+  Archive, Plus, Trash2, Eye, EyeOff, Lock,
+  ChevronDown, Search, X, Save
 } from 'lucide-react';
 import axios from 'axios';
 import { 
@@ -388,11 +387,16 @@ const Vault = () => {
           </div>
         </div>
         <button
-          onClick={() => setShowForm(!showForm)}
+          onClick={() => {
+            if (selectedType !== 'all') {
+              setFormData({...formData, asset_type: selectedType});
+            }
+            setShowForm(!showForm);
+          }}
           className="btn-primary flex items-center gap-2"
         >
           <Plus className="w-5 h-5" />
-          Add Asset
+          {selectedType !== 'all' ? `Add ${assetTypes.find(t => t.value === selectedType)?.label}` : 'Add Asset'}
         </button>
       </div>
 
